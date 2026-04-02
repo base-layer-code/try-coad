@@ -4,16 +4,17 @@
     <meta charset="UTF-8">
     <title>⚡ MY CUSTOM PLAYGROUND</title>
     <link rel="stylesheet" href="style.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GOD PUSH">
+
+<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/179/179386.png">
+
 </head>
 <body>
     <header>
         <div class="logo">⚡ PLAYGROUND</div>
-        <div class="controls">
-            <input type="file" id="load-file" hidden onchange="loadFile(event)">
-            <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 読み込む</button>
-            <button class="btn-sub" onclick="toggleFullScreen()">📺 全画面表示</button>
-            <button class="btn-main" onclick="runPreview()">▶ 実行 (Ctrl+S)</button>
-        </div>
+
     </header>
 
     <main>
@@ -24,6 +25,16 @@
                 <input type="text" id="replace-in" placeholder="変える単語">
                 <button onclick="runReplace()">一括書き換え</button>
             </div>
+            <div class="controls">
+    <input type="file" id="load-file" hidden onchange="loadFile(event)">
+    
+    <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 読み込む</button>
+    
+    <button class="btn-sub" onclick="toggleFullScreen()">📺 全画面表示</button>
+    
+    <button class="btn-main" onclick="runPreview()">▶ 実行 (Ctrl+S)</button>
+</div>
+
             <textarea id="editor" spellcheck="false" placeholder="ここにコードを貼り付けるか、ファイルを読み込んでください..."></textarea>
         </section>
 
