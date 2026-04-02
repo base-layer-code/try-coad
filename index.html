@@ -2,17 +2,16 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>My Personal Playground</title>
+    <title>⚡ MY CUSTOM PLAYGROUND</title>
     <link rel="stylesheet" href="style.css">
-    <button class="btn-sub" onclick="openFullPreview()">🌐 別タブで全画面表示</button>
-
 </head>
 <body>
     <header>
-        <h1>⚡ MY PLAYGROUND</h1>
+        <div class="logo">⚡ PLAYGROUND</div>
         <div class="controls">
             <input type="file" id="load-file" hidden onchange="loadFile(event)">
-            <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 ファイル読込</button>
+            <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 読み込む</button>
+            <button class="btn-sub" onclick="toggleFullScreen()">📺 全画面表示</button>
             <button class="btn-main" onclick="runPreview()">▶ 実行 (Ctrl+S)</button>
         </div>
     </header>
@@ -20,16 +19,16 @@
     <main>
         <section class="editor-pane">
             <div class="rewrite-bar">
-                <input type="text" id="find-in" placeholder="検索">
-                <span>→</span>
-                <input type="text" id="replace-in" placeholder="置換">
-                <button onclick="runReplace()">一括変換</button>
+                <input type="text" id="find-in" placeholder="探す単語">
+                <span>➡</span>
+                <input type="text" id="replace-in" placeholder="変える単語">
+                <button onclick="runReplace()">一括書き換え</button>
             </div>
-            <textarea id="editor" spellcheck="false" placeholder="ここにコードを書くか、ファイルを読み込んでください..."></textarea>
+            <textarea id="editor" spellcheck="false" placeholder="ここにコードを貼り付けるか、ファイルを読み込んでください..."></textarea>
         </section>
 
         <section class="preview-pane">
-            <iframe id="preview"></iframe>
+            <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
         </section>
     </main>
 
