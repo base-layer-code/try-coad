@@ -33,6 +33,17 @@ function runPreview() {
     previewDoc.write(code);
     previewDoc.close();
 }
+function openFullPreview() {
+    const code = document.getElementById('editor').value;
+    
+    // 新しいタブ（ウィンドウ）を開く
+    const newWindow = window.open();
+    
+    // その新しいタブのドキュメントにエディタのコードを書き込む
+    newWindow.document.open();
+    newWindow.document.write(code);
+    newWindow.document.close();
+}
 
 // ショートカットキー (Ctrl + S で実行)
 document.addEventListener('keydown', (e) => {
