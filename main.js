@@ -34,15 +34,16 @@ function runPreview() {
     previewDoc.close();
 }
 
-// 4. 全画面表示 (モニターいっぱいにプレビューを出す)
 function toggleFullScreen() {
     const preview = document.getElementById('preview');
-    if (preview.requestFullscreen) {
+    // iPad/iPhoneのSafari向けには webkitRequestFullscreen を優先的に試す
+    if (preview.webkitRequestFullscreen) {
+        preview.webkitRequestFullscreen();
+    } else if (preview.requestFullscreen) {
         preview.requestFullscreen();
-    } else if (preview.webkitRequestFullscreen) {
-        preview.webkitRequestFullscreen(); // Safari
     }
 }
+
 
 // 5. ショートカットキー (Ctrl + S) で実行
 document.addEventListener('keydown', (e) => {
