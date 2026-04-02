@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>My Personal Playground</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>⚡ MY PLAYGROUND</h1>
+        <div class="controls">
+            <input type="file" id="load-file" hidden onchange="loadFile(event)">
+            <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 ファイル読込</button>
+            <button class="btn-main" onclick="runPreview()">▶ 実行 (Ctrl+S)</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="editor-pane">
+            <div class="rewrite-bar">
+                <input type="text" id="find-in" placeholder="検索">
+                <span>→</span>
+                <input type="text" id="replace-in" placeholder="置換">
+                <button onclick="runReplace()">一括変換</button>
+            </div>
+            <textarea id="editor" spellcheck="false" placeholder="ここにコードを書くか、ファイルを読み込んでください..."></textarea>
+        </section>
+
+        <section class="preview-pane">
+            <iframe id="preview"></iframe>
+        </section>
+    </main>
+
+    <script src="main.js"></script>
+</body>
+</html>
