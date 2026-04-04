@@ -1,202 +1,600 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GOD PUSH">
-
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/179/179386.png">
-
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>⚡ コード試す用</title>
-    <style>
-        :root {
-            --bg-dark: #121212;
-            --panel-dark: #1e1e1e;
-            --accent: #00ff88;
-            --white: #ffffff;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="統合メモ">
+<link rel="manifest" href="manifest.json">
 
-        html, body {
-            margin: 0; padding: 0;
-            height: 100%; width: 100%;
-            background: var(--bg-dark);
-            color: var(--white);
-            font-family: 'Segoe UI', sans-serif;
+
+    <title>ULTIMATE MEMO - 統合管理ツール</title>
+    <style>
+        :root { 
+            --bg: #1e1e1e;
+            --panel: #2d2d2d; 
+            --accent: #00ff88; 
+            --delete-accent: #ff4444;
+            --text: #e0e0e0; 
+        }
+        body { 
+            margin: 0;
+            background: var(--bg); 
+            color: var(--text); 
+            font-family: 'Segoe UI', sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
             overflow: hidden;
         }
-
-        #wrapper { display: flex; flex-direction: column; height: 100vh; }
-
-        header {
-            background: #000;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #333;
-        }
-        .logo { color: var(--accent); font-weight: bold; font-size: 18px; }
-
-        main { display: flex; flex: 1; overflow: hidden; }
-
-        /* エディタ側 */
-        .editor-pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border-right: 1px solid #333;
-            background: var(--panel-dark);
-        }
-
-        .toolbar-top {
-            padding: 10px;
+        
+        /* タブエリア */
+        .tabs-bar { 
             background: #111;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            border-bottom: 1px solid #333;
+            display: flex; 
+            align-items: center; 
+            padding: 5px 10px 0; 
+            gap: 5px; 
+            border-bottom: 1px solid #444;
         }
-
-        input[type="text"] {
-            background: #000; border: 1px solid #444; color: #fff;
-            padding: 6px 10px; border-radius: 4px; font-size: 12px; width: 90px;
+        .tab { 
+            padding: 8px 15px; 
+            background: #333; 
+            color: #888;
+            border-radius: 5px 5px 0 0; 
+            cursor: pointer; 
+            font-size: 12px; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
         }
-
-        button {
-            background: #333; color: #fff; border: none;
-            padding: 6px 12px; border-radius: 4px; cursor: pointer;
-            font-size: 12px; font-weight: bold;
+        .tab.active { 
+            background: var(--panel); 
+            color: var(--accent); 
+            border: 1px solid #444; 
+            border-bottom: none;
         }
-        button:hover { background: #444; }
-        .btn-main { background: var(--accent); color: #000; }
-
-        textarea {
-            flex: 1;
-            background: transparent;
-            color: #d4d4d4;
+        .btn-add-tab { 
+            background: none; 
+            border: none; 
+            color: #fff; 
+            font-size: 20px; 
+            cursor: pointer;
+            padding: 0 10px; 
+        }
+        .btn-close-tab { 
+            font-size: 10px; 
+            color: #888; 
             border: none;
-            resize: none;
-            outline: none;
-            font-family: 'Consolas', monospace;
-            font-size: 14px;
-            padding: 15px;
+            background: none; 
+            cursor: pointer; 
         }
+        .btn-close-tab:hover { color: #ff4444; }
 
-        /* プレビュー側 */
-        .preview-pane {
-            flex: 1;
-            background: #fff;
-            position: relative;
+        .container { 
+            display: flex; 
+            flex-grow: 1; 
+            overflow: hidden;
         }
         
-        /* プレビュー本体 */
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #fff;
+        /* サイドバー */
+        .sidebar { 
+            width: 350px;
+            background: var(--panel); 
+            border-right: 1px solid #444; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 20px; 
+            overflow-y: auto;
+        }
+        h2 { 
+            font-size: 16px; 
+            margin: 0 0 15px 0;
+            border-left: 4px solid var(--accent); 
+            padding-left: 10px; 
+        }
+        
+        .section-title { 
+            font-size: 11px;
+            color: #888; 
+            margin: 15px 0 8px; 
+            text-transform: uppercase; 
+            letter-spacing: 1px;
+        }
+        .input-group { margin-bottom: 10px; }
+        input[type="text"] { 
+            width: 100%; 
+            padding: 8px; 
+            background: #111; 
+            border: 1px solid #444;
+            color: #fff; 
+            box-sizing: border-box; 
+            border-radius: 4px; 
+            font-size: 13px; 
+        }
+        
+        .checkbox-grid { 
+            display: grid;
+            grid-template-columns: 1fr 1fr; 
+            gap: 5px; 
+            background: #222; 
+            padding: 10px; 
+            border-radius: 4px;
+        }
+        .checkbox-grid label { 
+            display: flex; align-items: center; color: #ddd; font-size: 12px; cursor: pointer; 
+        }
+        
+        button { cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; }
+        .btn-exe { width: 100%; padding: 10px; color: #fff; margin: 10px 0; font-size: 13px; }
+        .del-theme { background: var(--delete-accent); }
+        .rep-theme { background: var(--accent); color: #000; }
+        button:hover { opacity: 0.8; }
+        
+        .undo-redo-group { display: flex; gap: 5px; margin-bottom: 15px; }
+        .btn-ctrl { flex: 1; padding: 8px; background: #444; color: #fff; font-size: 12px; }
+        .btn-ctrl:disabled { opacity: 0.2; }
+
+        .history-area { 
+            flex-shrink: 0; overflow-y: auto; background: #111; border-radius: 4px; 
+            padding: 10px; font-size: 11px; min-height: 100px; max-height: 150px;
+            border: 1px solid #333; margin-bottom: 10px;
+        }
+        .history-item { border-bottom: 1px solid #222; padding: 5px 0; color: #aaa; }
+
+        /* メインエディタ */
+        .main { 
+            flex-grow: 1; display: flex; flex-direction: column; padding: 20px; gap: 10px; position: relative;
+        }
+        .toolbar { display: flex; gap: 10px; }
+        
+        /* ワークスペース（エディタとプレビューが切り替わる場所） */
+        .workspace {
+            flex-grow: 1; display: flex; position: relative; overflow: hidden; border-radius: 4px;
+        }
+        
+        textarea { 
+            width: 100%; height: 100%; box-sizing: border-box;
+            background: #111; color: #d4d4d4; font-family: 'Consolas', monospace; 
+            padding: 15px; border: 1px solid #444; resize: none; 
+            line-height: 1.6; font-size: 14px;
+        }
+        textarea:focus { outline: 1px solid var(--accent); }
+        
+        .footer { display: flex; gap: 10px; align-items: center; }
+        .btn-secondary { background: #444; color: #fff; padding: 8px 15px; font-size: 12px; }
+        .btn-primary { background: #007bff; color: #fff; padding: 8px 15px; font-size: 12px; }
+        
+        .status-bar { font-size: 10px; color: #666; text-align: right; }
+
+        .restore-btn { background: #555; color: #fff; font-size: 9px; padding: 2px 5px; border-radius: 3px; float: right; }
+        .restore-btn:hover { background: var(--accent); color: #000; }
+
+        /* ★追加: プレビューコンテナと全画面化スタイル */
+        #preview-container {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+            background: #fff; z-index: 50; flex-direction: column;
+        }
+        #preview-container.fullscreen {
+            position: fixed !important; top: 0; left: 0; width: 100vw !important; height: 100vh !important;
+            z-index: 99999 !important; border-radius: 0; margin: 0; padding: 0;
+        }
+        .preview-controls {
+            position: absolute; top: 10px; right: 20px; z-index: 60; display: flex; gap: 10px;
+        }
+        .preview-controls button {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5); font-size: 12px;
         }
     </style>
 </head>
 <body>
 
-<div id="wrapper">
-    <header><div class="logo">⚡ PLAYGROUND</div></header>
+<div class="tabs-bar" id="tabs-bar">
+    <button class="btn-add-tab" onclick="createNewMemo()">+</button>
+</div>
 
-    <main>
-        <section class="editor-pane">
-            <div class="toolbar-top">
-                <input type="text" id="find-in" placeholder="探す単語">
-                <input type="text" id="replace-in" placeholder="変える単語">
-                <button onclick="runReplace()">置換</button>
-                
-                <input type="file" id="load-file" style="display:none" onchange="loadFile(event)">
-                <button onclick="document.getElementById('load-file').click()">📂 読み込む</button>
-                
-                <button onclick="previewFullScreen()">📺 実行画面を全画面</button>
-                
-                <button class="btn-main" onclick="downloadCode()">▶ 保存 (Ctrl+S)</button>
+<div class="container">
+    <div class="sidebar">
+        <h2>TOOLS</h2>
+
+        <div class="undo-redo-group">
+            <button id="undo-btn" class="btn-ctrl" onclick="undo()">↩ 戻る</button>
+            <button id="redo-btn" class="btn-ctrl" onclick="redo()">↪ 進む</button>
+        </div>
+
+        <div class="section-title">一括置換 (REWRITE)</div>
+        <div class="input-group">
+            <input type="text" id="find-in" placeholder="探す単語">
+            <input type="text" id="replace-in" placeholder="変える単語" style="margin-top:5px;">
+        </div>
+        <button class="btn-exe rep-theme" onclick="runReplace()">置換 ＆ 記録</button>
+
+        <div class="section-title">単語消去 (DELETE)</div>
+        <div class="input-group" id="word-del-inputs">
+            <input type="text" class="del-in" placeholder="消す単語 1">
+            <input type="text" class="del-in" placeholder="消す単語 2" style="margin-top:5px;">
+        </div>
+
+        <div class="section-title">タイプ別消去</div>
+        <div class="checkbox-grid">
+            <label><input type="checkbox" value="num"> 数字</label>
+            <label><input type="checkbox" value="sym"> 記号</label>
+            <label><input type="checkbox" value="roma"> ローマ字</label>
+            <label><input type="checkbox" value="jp"> 日本語</label>
+            <label><input type="checkbox" value="kan"> 漢字</label>
+            <label><input type="checkbox" value="hira"> ひらがな</label>
+        </div>
+        <button class="btn-exe del-theme" onclick="runDelete()">消去実行 ＆ 記録</button>
+
+        <div class="section-title">操作履歴</div>
+        <div id="history" class="history-area">
+            <div style="color:#555">履歴はありません</div>
+        </div>
+
+        <div class="section-title">削除済みメモ (最大10件)</div>
+        <div id="deleted-memos" class="history-area">
+            <div style="color:#555">削除履歴はありません</div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="toolbar">
+            <input type="file" id="load-file" style="display:none" onchange="loadFile(event)">
+            <button class="btn-secondary" onclick="document.getElementById('load-file').click()">読み込む</button>
+            <input type="text" id="memo-title" placeholder="メモのタイトル" style="width: 200px; background: #222; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 4px;" oninput="updateTabTitle()">
+        </div>
+
+        <div class="workspace">
+            <textarea id="editor" placeholder="ここにテキスト(またはHTML)を入力してください..." oninput="autoSave()"></textarea>
+            
+            <div id="preview-container">
+                <div class="preview-controls">
+                    <button class="btn-secondary" onclick="togglePreviewFullscreen()">全画面切替</button>
+                    <button class="del-theme" style="padding: 8px 15px; color: #fff; border: none;" onclick="endTest()">■ テスト終了</button>
+                </div>
+                <iframe id="preview" style="width: 100%; height: 100%; border: none; background: #fff;"></iframe>
             </div>
-            <textarea id="editor" spellcheck="false" placeholder="HTMLコードを入力..." oninput="updatePreview()"></textarea>
-        </section>
-
-        <section class="preview-pane" id="preview-container">
-            <iframe id="preview" allowfullscreen></iframe>
-        </section>
-    </main>
+        </div>
+        
+        <div class="footer">
+            <button class="btn-primary" onclick="download('text')">テキストを保存</button>
+            <button class="btn-secondary" onclick="download('memo')">履歴を保存</button>
+            
+            <button class="rep-theme" style="padding: 8px 15px; font-size: 12px; margin-left: 10px;" onclick="runHTML()">▶ コード実行</button>
+            
+            <div style="flex-grow:1"></div>
+            <div id="save-status" class="status-bar">保存済み</div>
+        </div>
+    </div>
 </div>
 
 <script>
-    const editor = document.getElementById('editor');
-    const preview = document.getElementById('preview');
+    // 状態管理
+    let memos = []; 
+    let activeMemoId = null;
+    let deletedMemos = [];
 
-    [span_0](start_span)// プレビューのリアルタイム更新[span_0](end_span)
-    function updatePreview() {
-        const doc = preview.contentDocument || preview.contentWindow.document;
-        doc.open();
-        doc.write(editor.value);
-        doc.close();
+    const patterns = {
+        num: { regex: /[0-9０-９]/g, label: "数字" },
+        sym: { regex: /[\x21-\x2f\x3a-\x40\x5b-\x60\x7b-\x7e]|[！-／：-＠［-｀｛-｝]|[\u2000-\u206F\u2500-\u257F\u25A0-\u25FF\u2190-\u21FF\u2200-\u22FF\u2600-\u26FF\u3000-\u303F]/g, label: "記号" },
+        roma: { regex: /[a-zA-Z]/g, label: "ローマ字" },
+        jp: { regex: /[ぁ-んァ-ヶー一-龠]/g, label: "日本語" },
+        kan: { regex: /[一-龠]/g, label: "漢字" },
+        hira: { regex: /[ぁ-ん]/g, label: "ひらがな" }
+    };
+
+    // 初期化
+    window.onload = () => {
+        const saved = localStorage.getItem('ultimate_memo_data');
+        if (saved) {
+            memos = JSON.parse(saved);
+            activeMemoId = memos[0].id;
+        } else {
+            createNewMemo();
+        }
+
+        const savedDeleted = localStorage.getItem('ultimate_memo_deleted');
+        if (savedDeleted) {
+            deletedMemos = JSON.parse(savedDeleted);
+        }
+
+        renderTabs();
+        loadActiveMemo();
+        updateDeletedUI();
+    };
+
+    function createNewMemo() {
+        const id = Date.now();
+        const newMemo = {
+            id: id,
+            title: "新規メモ",
+            content: "",
+            history: [],
+            undoStack: [],
+            redoStack: []
+        };
+        memos.push(newMemo);
+        activeMemoId = id;
+        renderTabs();
+        loadActiveMemo();
+        autoSave();
     }
 
-    [span_1](start_span)// 置換機能[span_1](end_span)
-    function runReplace() {
-        const f = document.getElementById('find-in').value;
-        const r = document.getElementById('replace-in').value;
-        if (f) {
-            editor.value = editor.value.split(f).join(r);
-            updatePreview();
+    function loadActiveMemo() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (!memo) return;
+        document.getElementById('editor').value = memo.content;
+        document.getElementById('memo-title').value = memo.title;
+        updateHistoryUI();
+        updateCtrlButtons();
+        // もし別のタブを開いたらテストモードは終了させる
+        if (document.getElementById('preview-container').style.display === 'flex') {
+            endTest();
         }
     }
 
-    [span_2](start_span)// ファイル読み込み[span_2](end_span)
+    function renderTabs() {
+        const bar = document.getElementById('tabs-bar');
+        const addButton = bar.querySelector('.btn-add-tab');
+        bar.querySelectorAll('.tab').forEach(t => t.remove());
+
+        memos.forEach(memo => {
+            const tab = document.createElement('div');
+            tab.className = `tab ${memo.id === activeMemoId ? 'active' : ''}`;
+            tab.onclick = () => switchMemo(memo.id);
+            tab.innerHTML = `
+                <span>${memo.title || '無題'}</span>
+                <button class="btn-close-tab" onclick="closeTab(event, ${memo.id})">×</button>
+            `;
+            bar.insertBefore(tab, addButton);
+        });
+    }
+
+    function switchMemo(id) {
+        activeMemoId = id;
+        renderTabs();
+        loadActiveMemo();
+    }
+
+    function closeTab(e, id) {
+        e.stopPropagation();
+        if (memos.length === 1) return;
+
+        const targetIndex = memos.findIndex(m => m.id === id);
+        if (targetIndex !== -1) {
+            const deleted = memos.splice(targetIndex, 1)[0];
+            deletedMemos.unshift(deleted);
+            if (deletedMemos.length > 10) deletedMemos.pop();
+            saveDeletedStates();
+            updateDeletedUI();
+        }
+
+        if (activeMemoId === id) activeMemoId = memos[0].id;
+        renderTabs();
+        loadActiveMemo();
+        autoSave();
+    }
+
+    function updateTabTitle() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (memo) {
+            memo.title = document.getElementById('memo-title').value;
+            renderTabs();
+            autoSave();
+        }
+    }
+
+    function autoSave() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (memo) {
+            memo.content = document.getElementById('editor').value;
+        }
+        localStorage.setItem('ultimate_memo_data', JSON.stringify(memos));
+        
+        const status = document.getElementById('save-status');
+        status.innerText = "保存中...";
+        setTimeout(() => { status.innerText = "保存済み"; }, 800);
+    }
+
+    function saveState() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (!memo) return;
+        memo.undoStack.push({ content: memo.content, history: [...memo.history] });
+        memo.redoStack = [];
+        updateCtrlButtons();
+    }
+
+    function runDelete() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        let content = document.getElementById('editor').value;
+        let info = [];
+        saveState();
+
+        document.querySelectorAll('.del-in').forEach(input => {
+            if (input.value && content.includes(input.value)) {
+                content = content.split(input.value).join("");
+                info.push(`「${input.value}」`);
+                input.value = "";
+            }
+        });
+
+        document.querySelectorAll('.checkbox-grid input:checked').forEach(chk => {
+            const p = patterns[chk.value];
+            if (content.match(p.regex)) {
+                content = content.replace(p.regex, "");
+                info.push(`[${p.label}]`);
+            }
+            chk.checked = false;
+        });
+
+        if (info.length > 0) applyChanges(content, `消去: ${info.join(", ")}`);
+        else { memo.undoStack.pop(); alert("対象が見つかりません"); }
+    }
+
+    function runReplace() {
+        const findVal = document.getElementById('find-in').value;
+        const replaceVal = document.getElementById('replace-in').value;
+        let content = document.getElementById('editor').value;
+
+        if (!findVal) return alert("探す単語を入力してください");
+        saveState();
+
+        const newContent = content.split(findVal).join(replaceVal);
+        if (content !== newContent) {
+            applyChanges(newContent, `置換: 「${findVal}」→「${replaceVal}」`);
+            document.getElementById('find-in').value = "";
+            document.getElementById('replace-in').value = "";
+        } else {
+            const memo = memos.find(m => m.id === activeMemoId);
+            memo.undoStack.pop();
+            alert("見つかりませんでした");
+        }
+    }
+
+    function applyChanges(newContent, message) {
+        const memo = memos.find(m => m.id === activeMemoId);
+        const time = new Date().toLocaleTimeString();
+        memo.content = newContent;
+        memo.history.push(`[${time}] ${message}`);
+        document.getElementById('editor').value = newContent;
+        updateHistoryUI();
+        updateCtrlButtons();
+        autoSave();
+    }
+
+    function undo() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (!memo || memo.undoStack.length === 0) return;
+        memo.redoStack.push({ content: memo.content, history: [...memo.history] });
+        const last = memo.undoStack.pop();
+        memo.content = last.content;
+        memo.history = last.history;
+        loadActiveMemo();
+        autoSave();
+    }
+
+    function redo() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (!memo || memo.redoStack.length === 0) return;
+        memo.undoStack.push({ content: memo.content, history: [...memo.history] });
+        const next = memo.redoStack.pop();
+        memo.content = next.content;
+        memo.history = next.history;
+        loadActiveMemo();
+        autoSave();
+    }
+
+    function updateHistoryUI() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        const histDiv = document.getElementById('history');
+        if (!memo || !memo.history.length) {
+            histDiv.innerHTML = '<div style="color:#555">履歴はありません</div>';
+            return;
+        }
+        histDiv.innerHTML = memo.history.map(log => `<div class="history-item">${log}</div>`).reverse().join("");
+    }
+
+    function updateCtrlButtons() {
+        const memo = memos.find(m => m.id === activeMemoId);
+        if (!memo) return;
+        document.getElementById('undo-btn').disabled = memo.undoStack.length === 0;
+        document.getElementById('redo-btn').disabled = memo.redoStack.length === 0;
+    }
+
     function loadFile(e) {
         const file = e.target.files[0];
-        if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-            editor.value = ev.target.result;
-            updatePreview();
+            saveState();
+            document.getElementById('editor').value = ev.target.result;
+            autoSave();
         };
         reader.readAsText(file);
     }
 
-    // ★今回のメイン：実行画面（iframe）だけを全画面にする
-    function previewFullScreen() {
-        // iframeを包んでいるコンテナを取得
-        const container = document.getElementById('preview-container');
+    function download(type) {
+        const memo = memos.find(m => m.id === activeMemoId);
+        let content = type === 'text' ? memo.content : "■ 履歴\n" + memo.history.join("\n");
+        let name = type === 'text' ? `${memo.title}.txt` : "history.txt";
+        const blob = new Blob([content], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = name;
+        a.click();
+    }
 
-        if (!document.fullscreenElement) {
-            if (container.requestFullscreen) {
-                container.requestFullscreen();
-            } else if (container.webkitRequestFullscreen) {
-                container.webkitRequestFullscreen();
-            } else if (container.mozRequestFullScreen) {
-                container.mozRequestFullScreen();
-            } else if (container.msRequestFullscreen) {
-                container.msRequestFullscreen();
-            }
-        } else {
-            document.exitFullscreen();
+    function restoreMemo(id) {
+        const index = deletedMemos.findIndex(m => m.id === id);
+        if (index !== -1) {
+            const restored = deletedMemos.splice(index, 1)[0];
+            memos.push(restored);
+            activeMemoId = restored.id;
+            saveDeletedStates();
+            updateDeletedUI();
+            renderTabs();
+            loadActiveMemo();
+            autoSave();
         }
     }
 
-    [span_3](start_span)// 保存機能 [cite: 94-96]
-    function downloadCode() {
-        const content = editor.value;
-        const blob = new Blob([content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = "index.html";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+    function updateDeletedUI() {
+        const container = document.getElementById('deleted-memos');
+        if (deletedMemos.length === 0) {
+            container.innerHTML = '<div style="color:#555">削除履歴はありません</div>';
+            return;
+        }
+        container.innerHTML = deletedMemos.map(memo => `
+            <div class="history-item">
+                <button class="restore-btn" onclick="restoreMemo(${memo.id})">復元</button>
+                <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${memo.title || '無題'}</div>
+            </div>
+        `).join("");
     }
 
-    window.onload = updatePreview;
-</script>
+    function saveDeletedStates() {
+        localStorage.setItem('ultimate_memo_deleted', JSON.stringify(deletedMemos));
+    }
 
+    // ==========================================
+    // ★追加: コードテスト（プレビュー機能）
+    // ==========================================
+    function runHTML() {
+        const code = document.getElementById('editor').value;
+        const blob = new Blob([code], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        document.getElementById('preview').src = url;
+        
+        // エディタを隠してプレビュー画面を表示
+        document.getElementById('editor').style.display = 'none';
+        document.getElementById('preview-container').style.display = 'flex';
+    }
+
+    function endTest() {
+        // プレビューを初期化して非表示、エディタを再表示
+        document.getElementById('preview').src = 'about:blank';
+        document.getElementById('preview-container').style.display = 'none';
+        document.getElementById('editor').style.display = 'block';
+        
+        // 全画面状態だった場合は解除しておく
+        if (document.getElementById('preview-container').classList.contains('fullscreen')) {
+            togglePreviewFullscreen();
+        }
+    }
+
+    function togglePreviewFullscreen() {
+        const container = document.getElementById('preview-container');
+        container.classList.toggle('fullscreen');
+    }
+    
+    if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./sw.js');
+    });
+}
+
+</script>
 </body>
 </html>
