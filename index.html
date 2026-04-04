@@ -2,47 +2,251 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>⚡ MY CUSTOM PLAYGROUND</title>
-    <link rel="stylesheet" href="style.css">
     <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="GOD PUSH">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GOD PUSH">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/179/179386.png">
 
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/179/179386.png">
+    <style>
+        :root {
+            --bg-dark: #121212;
+            --panel-dark: #1e1e1e;
+            --accent: #00ff88;
+            --text-gray: #aaaaaa;
+            --white: #ffffff;
+        }
 
+        /* 画面全体のレイアウト */
+        html, body {
+            margin: 0; padding: 0;
+            height: 100%; width: 100%;
+            background: var(--bg-dark);
+            color: var(--white);
+            font-family: 'Segoe UI', sans-serif;
+            overflow: hidden;
+        }
+
+        #wrapper {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* ヘッダー */
+        header {
+            background: #000;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .logo { color: var(--accent); font-weight: bold; font-size: 18px; }
+
+        /* メイン：左右分割 */
+        main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* 左側（エディタペイン） */
+        .editor-pane {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #333;
+            background: var(--panel-dark);
+        }
+
+        /* ツールバー関連 */
+        .toolbar-top {
+            padding: 10px;
+            background: #111;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        input[type="text"] {
+            background: #000; border: 1px solid #444; color: #fff;
+            padding: 6px 10px; border-radius: 4px; font-size: 12px; width: 100px;
+        }
+
+        button {
+            background: #333; color: #fff; border: none;
+            padding: 6px 12px; border-radius: 4px; cursor: pointer;
+            font-size: 12px; font-weight: bold; transition: 0.2s;
+        }
+        button:hover { background: #444; }
+        .btn-sub { background: #444; }
+        .btn-main { background: var(--accent); color: #000; }
+        .btn-main:hover { background: #00cc6e; }
+
+        /* エディタ部分 */
+        textarea {
+            flex: 1;
+            background: transparent;
+            color: #d4d4d4;
+            border: none;
+            resize: none;
+            outline: none;
+            font-family: 'Consolas', monospace;
+            font-size: 14px;
+            padding: 15px;
+            line-height: 1.6;
+        }
+
+        /* 右側（プレビューペイン） */
+        .preview-pane {
+            flex: 1;
+            background: #fff;
+            display: flex;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
 </head>
 <body>
+
+<div id="wrapper">
     <header>
         <div class="logo">⚡ PLAYGROUND</div>
-
     </header>
 
     <main>
         <section class="editor-pane">
-            <div class="rewrite-bar">
-                <input type="text" id="find-in" placeholder="探す単語">
-                <span>➡</span>
-                <input type="text" id="replace-in" placeholder="変える単語">
-                <button onclick="runReplace()">一括書き換え</button>
+            <div class="toolbar-top">
+                <div class="input-group">
+                    <input type="text" id="find-in" placeholder="探す単語">
+                    <span style="color:#666">➡</span>
+                    <input type="text" id="replace-in" placeholder="変える単語">
+                    <button onclick="runReplace()">一括書き換え</button>
+                </div>
+                
+                <div style="width:1px; height:20px; background:#444; margin:0 5px;"></div>
+                
+                <input type="file" id="load-file" style="display:none" onchange="loadFile(event)">
+                <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 読み込む</button>
+                
+                <button class="btn-sub" onclick="toggleFullScreen()">📺 全画面表示</button>
+                
+                <button class="btn-main" onclick="runPreview()">▶ 実行 & 保存 (Ctrl+S)</button>
             </div>
-            <div class="controls">
-    <input type="file" id="load-file" hidden onchange="loadFile(event)">
-    
-    <button class="btn-sub" onclick="document.getElementById('load-file').click()">📂 読み込む</button>
-    
-    <button class="btn-sub" onclick="toggleFullScreen()">📺 全画面表示</button>
-    
-    <button class="btn-main" onclick="runPreview()">▶ 実行 (Ctrl+S)</button>
-</div>
 
-            <textarea id="editor" spellcheck="false" placeholder="ここにコードを貼り付けるか、ファイルを読み込んでください..."></textarea>
+            <textarea id="editor" spellcheck="false" placeholder="ここにコードを貼り付けるか、ファイルを読み込んでください..." oninput="updatePreview()"></textarea>
         </section>
 
         <section class="preview-pane">
-            <iframe id="preview" sandbox="allow-scripts allow-same-origin"></iframe>
+            <iframe id="preview"></iframe>
         </section>
     </main>
+</div>
 
-    <script src="main.js"></script>
+<script>
+    const editor = document.getElementById('editor');
+    const previewFrame = document.getElementById('preview');
+
+    // --- プレビューのリアルタイム更新 ---
+    function updatePreview() {
+        const doc = previewFrame.contentDocument || previewFrame.contentWindow.document;
+        doc.open();
+        doc.write(editor.value);
+        doc.close();
+    }
+
+    // --- 一括書き換え（置換）機能 ---
+    function runReplace() {
+        const f = document.getElementById('find-in').value;
+        const r = document.getElementById('replace-in').value;
+        if (f) {
+            editor.value = editor.value.split(f).join(r);
+            updatePreview(); // 置換後すぐにプレビュー反映
+        }
+    }
+
+    // --- ファイルの読み込み ---
+    function loadFile(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            editor.value = ev.target.result;
+            updatePreview(); // 読み込み後すぐにプレビュー反映
+        };
+        reader.readAsText(file);
+        // 連続で同じファイルを選べるようにリセット
+        e.target.value = ''; 
+    }
+
+    // --- 全画面表示（修正版） ---
+    function toggleFullScreen() {
+        // ページ全体（documentElement）を対象にする
+        const docElm = document.documentElement;
+        if (!document.fullscreenElement) {
+            // 各ブラウザ対応の全画面リクエスト
+            if (docElm.requestFullscreen) {
+                docElm.requestFullscreen();
+            } else if (docElm.webkitRequestFullscreen) {
+                docElm.webkitRequestFullscreen();
+            }
+        } else {
+            // 全画面解除
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            }
+        }
+    }
+
+    // --- 実行＆保存機能（GitHub Pages対応） ---
+    function runPreview() {
+        updatePreview(); // 念のためプレビュー更新
+        
+        const content = editor.value;
+        if (!content) {
+            alert("コードが入力されていません！");
+            return;
+        }
+
+        const blob = new Blob([content], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "index.html"; // ダウンロードされるファイル名
+
+        // 必須：画面に一時的に追加してクリック
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // --- ショートカットキー (Ctrl+S / Cmd+S で保存) ---
+    window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+            e.preventDefault();
+            runPreview();
+        }
+    });
+
+    // --- 初期表示時にプレビューを反映 ---
+    window.onload = updatePreview;
+</script>
+
 </body>
 </html>
